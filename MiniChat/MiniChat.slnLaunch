@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "ClientServer",
+    "Projects": [
+      {
+        "Path": "MiniChat.Client\\MiniChat.Client.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MiniChat.Server\\MiniChat.Server.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
