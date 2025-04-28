@@ -2,30 +2,44 @@
 {
     internal class Program
     {
+        static HttpClient client = new HttpClient();
+
+        static string Request(string endpoint, string args)
+        {
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"http://localhost:5296/api/Chat/{endpoint}?{args}"
+            );
+
+            var response = client.Send(request);
+
+            response.EnsureSuccessStatusCode();
+
+            return response.Content
+                        .ReadAsStringAsync()
+                        .Result;
+        }
+
+
         static void Main(string[] args)
         {
-            var client = new HttpClient();
+            var userId = Int32.Parse(Console.ReadLine());
 
-            while (Console.ReadKey().Key != ConsoleKey.Escape)
+            while (true)
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5296/WeatherForecast")
-                {
-                    Content = new StringContent("""
-                    {
-                        "Barev": "Arev"
-                    }
-                    """, null, "application/json")
-                };
-
-                var response = client.Send(request);
-
-                response.EnsureSuccessStatusCode();
-
+                Console.Clear();
                 Console.WriteLine(
-                    response.Content
-                        .ReadAsStringAsync()
-                        .Result
+                    Request("GetMessages", "")
                 );
+
+                //Thread.Sleep(1000);
+
+                var message = Console.ReadLine();
+
+                if (!String.IsNullOrEmpty(message))
+                {
+                    Request("Send", $"userId={userId}&message={message}");
+                }
             }
         }
     }
