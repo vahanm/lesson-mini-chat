@@ -1,4 +1,8 @@
-﻿namespace MiniChat.Client
+﻿using System;
+using System.Net.Http;
+using System.Text.Json;
+
+namespace MiniChat.Client
 {
     internal class Program
     {
@@ -20,6 +24,12 @@
                         .Result;
         }
 
+        static T Request<T>(string endpoint, string args)
+        {
+            var json = Request(endpoint, args);
+
+            return JsonSerializer.Deserialize<T>(json);
+        }
 
         static void Main(string[] args)
         {

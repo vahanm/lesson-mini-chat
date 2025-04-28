@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace MiniChat.Server.Controllers
 {
@@ -7,6 +9,13 @@ namespace MiniChat.Server.Controllers
     [ApiController]
     public class ChatController : ControllerBase
     {
+        private readonly ILogger<ChatController> _logger;
+
+        public ChatController(ILogger<ChatController> logger)
+        {
+            this._logger = logger;
+        }
+
         [HttpGet]
         public int TestRequest()
         {
@@ -38,6 +47,8 @@ namespace MiniChat.Server.Controllers
         [HttpGet(nameof(Send))]
         public void Send(int userId, string message)
         {
+            this._logger.LogDebug($"{users[userId]}: {message}");
+
             messages.Add($"{users[userId]}: {message}");
         }
 
