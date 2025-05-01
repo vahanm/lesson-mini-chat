@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
+using MiniChat.Shared;
 
 namespace MiniChat.Client
 {
@@ -24,11 +26,16 @@ namespace MiniChat.Client
                         .Result;
         }
 
+        private static readonly JsonSerializerOptions options = new()
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+
         static T Request<T>(string endpoint, string args)
         {
             var json = Request(endpoint, args);
 
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json, options);
         }
 
         static void Main(string[] args)
@@ -38,11 +45,13 @@ namespace MiniChat.Client
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine(
-                    Request("GetMessages", "")
-                );
+                var messages = Request<List<UserMessage>>("GetMessages", "");
 
-                //Thread.Sleep(1000);
+                foreach (var item in messages)
+                {
+                    Console.WriteLine(item.Sender);
+                    Console.WriteLine("\t" + item.Content);
+                }
 
                 var message = Console.ReadLine();
 
