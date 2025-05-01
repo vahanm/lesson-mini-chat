@@ -40,11 +40,34 @@ namespace MiniChat.Client
 
         static void Main(string[] args)
         {
-            var userId = Int32.Parse(Console.ReadLine());
+            var users = Request<List<User>>("GetUsers", "");
+
+            foreach (var user in users)
+            {
+                Console.WriteLine($"{user.UserId}: {user.Name}");
+            }
+
+            Console.Write("Enter user name: ");
+
+            var userName = Console.ReadLine();
+
+            if (String.IsNullOrWhiteSpace(userName))
+            {
+                Console.WriteLine("Invalid user name.");
+
+                return;
+            }
+
+            var userId = Request<int>("Register", $"name={userName}");
 
             while (true)
             {
                 Console.Clear();
+
+                Console.WriteLine($"Me: {userId}: {userName}");
+                Console.WriteLine();
+                Console.WriteLine();
+
                 var messages = Request<List<UserMessage>>("GetMessages", "");
 
                 foreach (var item in messages)

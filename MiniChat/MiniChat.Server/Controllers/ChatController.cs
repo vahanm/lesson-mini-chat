@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MiniChat.Shared;
@@ -23,31 +24,37 @@ namespace MiniChat.Server.Controllers
             return Random.Shared.Next();
         }
 
-        private static List<string> users = [
-            "Vahan",
-            "Hasmik",
-            "Irina",
-            "Erik",
+        private static readonly List<User> users = [
+            new User { UserId = 0, Name = "Vahan" },
+            new User { UserId = 1, Name = "Hasmik" },
+            new User { UserId = 2, Name = "Irina" },
+            new User { UserId = 3, Name = "Erik" },
         ];
-
-        private static List<UserMessage> messages = [
-            new UserMessage {
+        // LINQ
+        private static List<UserMessage> messages =
+            users.Select(user => new UserMessage
+            {
                 Content = "Barev",
-                Sender = "Vahan"
-            },
-            new UserMessage {
-                Content = "Barev",
-                Sender = "Erik" 
-            },
-            
-        ];
+                Sender = user.Name
+            })
+            .ToList();
 
         [HttpGet(nameof(Register))]
         public int Register(string name)
         {
-            users.Add(name);
+            foreach (var user in users)
+            {
+                if (user.Name == name)
+                {
+                    return user.UserId;
+                }
+            }
 
-            return users.Count - 1;
+            var newUser = new User { UserId = users.Count, Name = name };
+
+            users.Add(newUser);
+
+            return newUser.UserId;
         }
 
         [HttpGet(nameof(Send))]
@@ -55,18 +62,25 @@ namespace MiniChat.Server.Controllers
         {
             this._logger.LogDebug($"{users[userId]}: {message}");
 
+            var user = users[userId];
+
             messages.Add(new UserMessage
             {
                 Content = message,
-                Sender = users[userId]
+                Sender = user.Name,
             });
-            //$"{users[userId]}: {message}"
         }
 
         [HttpGet(nameof(GetMessages))]
         public List<UserMessage> GetMessages()
         {
             return messages;
+        }
+
+        [HttpGet(nameof(GetUsers))]
+        public List<User> GetUsers()
+        {
+            return users;
         }
     }
 }
